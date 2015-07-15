@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">ImageScan</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="long_click">图片操作</string>
+    <string name="delete_firm">确定要删除该图片吗？</string>
+    <string name="Ok">确定</string>
+    <string name="Cancel">取消</string>
+
+    <array name="items_long_click">
+        <item name="edit">编辑</item>
+        <item name="delete">删除</item>
+    </array>
+    <string name="title_activity_editimg">editimg</string>
+    <string name="title_activity_slide_img">slideImg</string>
+
+</resources>

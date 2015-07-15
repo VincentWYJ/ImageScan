@@ -1,0 +1,16 @@
+实现功能：
+
+1、利用简单的getRootView(),getDrawingCache()函数能获取当前根Activity视图，
+但没有手机顶端应用程序图标、时间等，和获取视图的方式有关；*
+
+2、在获取第一张视图后，后面的获取就会出现不正常的重叠现象，
+可能是没有destoryDrawingCache()的缘故?原因是从view.getDrawingCache()到bitmap这一步，
+正确的赋值方式为Bitmap bitmap = Bitmap.createBitmap(view.getDrawingCache(),0,0,view.getWidth(),view.getHeight());
+否则就会出现照镜子一般的层层叠加的效果；
+
+3、但是依然存在的问题是，保存截屏图片后，在File Manager中能够看到，
+手机中其他图片浏览软件无法识别，和删除后他们依然读取得到一回事，手机文件系统没有进行同步；**
+已解决：给系统发送广播sendBroadcast(Intent)；
+
+4、网上很多例子是采用Linux下的编译源码或者shell命令等方法，
+还有反射调用Surface的"screenshot"，暂时在目前Wingdows系统中没有测试成功；

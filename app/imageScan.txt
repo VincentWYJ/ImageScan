@@ -1,0 +1,33 @@
+实现功能：
+
+1、读取手机中所有图片格式文件（jpg、bmp、png、gif、tif）；
+
+2、利用ImageView对某一幅图片进行显示，为了防止图片过多可能出现的new ImageView过于频繁，
+在每次new之前均对传入的View参数进行null值判断，若已存在则直接赋值而不进行new；
+
+3、所有的ImageView均存在一个GridView中；
+
+4、不同于单击编辑模式，实现了长按图片给出编辑选择列表，目前包括编辑、删除两项，
+选择删除后，会给出确认提示。用户确认后方才将GridView中的图片（即ImageView）删除,同时删除SD卡中的本地文件；
+但是电脑上显示的文件和手机别的图片浏览软件仍会将删除的文件读出，这是一个BUG。
+已解决：文件操作后需要给系统发送广播，让系统重新运行MediaScanner扫描服务，这样系统才会更新相册索引；
+
+5、增加了编辑功能，不过目前只是将缩略图放大处理ViewFlipper，可以左右滑动图片，实际的编辑功能还需进一步研究；
+在点击GridView中某一个ImageView时，播放时应该从点击的图片开始，所以在往ViewFlipper中添加ImageView时也应该从该图片开始，
+这是就用到了从主程序通过Bundle传过来的位置参数position，然后通过取余操作(indexImg+position)%countImg。
+上下滑动来浏览图片也给予了实现。
+
+6、原来长按-->选择编辑的操作现在用单击图片的形式重新实现了一遍，即在GridView中的某个ImageView上单击即可转到浏览图片模式；
+增加了上下滑动操作；
+
+7、设置了初始进入浏览模式时的自动滑动图片效果，直到点击某一幅图片方才停止；
+
+8、根据文件名读取图片时，有几种方式如BitmapFactory.decodeFile(String path),
+BitmapFactory.decodeStream(InputStream is)等，不同的是直接根据文件名来读取不会要求进行异常处理，
+而流方式会，这样做可以保证系统的稳定与安全。
+try{
+	is = new java.io.FileInputStream(String path);
+}
+catch(Exception e){
+	e.printStackTrace();
+}

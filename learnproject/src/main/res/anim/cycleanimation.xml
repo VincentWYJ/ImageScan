@@ -1,0 +1,6 @@
+<cycleInterpolator xmlns:android="http://schemas.android.com/apk/res/android"
+    android:cycles="3" />
+
+<!--
+android:cycles 动画循环播放的次数
+-->
