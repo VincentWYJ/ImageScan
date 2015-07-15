@@ -12,10 +12,15 @@ public class BootBroadcastReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
 
         if (intent.getAction().equals(ACTION)) {
+            /*
             Intent sayHelloIntent = new Intent(context, MainActivity.class);
             sayHelloIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
             context.startActivity(sayHelloIntent);
+            */
+
+            Intent sayHelloIntent = new Intent(context, Service1.class);
+            sayHelloIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startService(sayHelloIntent);
         }
     }
 }
