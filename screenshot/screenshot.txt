@@ -1,8 +1,0 @@
-手机截屏功能：
-
-1、根据网上提供的资料，下载了一个案例，原理是不用root等复杂操作即可完成，
-但是遇到的问题是IScreenshotProvider接口无法继承到工程中，其方法无法调用；
-原因在于：主文件夹下是*.aidl格式，里面只有接口的声明语句，
-而实现代码通过eclipse的gen目录可以找到*.java,将其加入Android Studio对应的文件夹下即可；
-
-2、编译没有错误，但是运行提示"native service not found"；
