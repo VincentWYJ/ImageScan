@@ -119,17 +119,17 @@ public class Service1 extends Service
                 mFloatView.setVisibility(View.INVISIBLE);   //立即消失
                 /*
                 Toast.makeText(Service1.this, "Service1", Toast.LENGTH_SHORT).show();
-                */
+
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     public void run() {
                         mFloatView.setVisibility(View.VISIBLE); //view是要隐藏的控件
                     }
                 }, 3000);  //3000毫秒后执行
+                */
 
-
-                //Intent intent = new Intent(getApplicationContext(),Service1.class);
-                //stopService(intent);
+                Intent intent = new Intent(getApplicationContext(),Service1.class);
+                stopService(intent);
             }
         });
     }

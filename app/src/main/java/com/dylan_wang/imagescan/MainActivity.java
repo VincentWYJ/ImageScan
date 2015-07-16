@@ -106,8 +106,8 @@ public class MainActivity extends ActionBarActivity {
                                                                     if (removeFile.exists()) {
                                                                         removeFile.delete();
                                                                         //adapterImg.notifyDataSetChanged();
-                                                                        //v.setVisibility(v.GONE);
-                                                                        adapterImg.notifyDataSetChanged();
+                                                                        v.setVisibility(v.GONE);
+                                                                        //adapterImg.notifyDataSetChanged();
                                                                         finish();
                                                                         Intent intent = new Intent(MainActivity.this, MainActivity.class);
                                                                         startActivity(intent);
