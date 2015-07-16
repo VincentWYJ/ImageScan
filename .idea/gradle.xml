@@ -13,7 +13,6 @@
             <option value="$PROJECT_DIR$/autostart" />
             <option value="$PROJECT_DIR$/getscreen" />
             <option value="$PROJECT_DIR$/learnproject" />
-            <option value="$PROJECT_DIR$/screenshot" />
           </set>
         </option>
       </GradleProjectSettings>

@@ -7,7 +7,6 @@
       <module fileurl="file://$PROJECT_DIR$/getscreen/getscreen.iml" filepath="$PROJECT_DIR$/getscreen/getscreen.iml" />
       <module fileurl="file://$PROJECT_DIR$/imageScan.iml" filepath="$PROJECT_DIR$/imageScan.iml" />
       <module fileurl="file://$PROJECT_DIR$/learnproject/learnproject.iml" filepath="$PROJECT_DIR$/learnproject/learnproject.iml" />
-      <module fileurl="file://$PROJECT_DIR$/screenshot/screenshot.iml" filepath="$PROJECT_DIR$/screenshot/screenshot.iml" />
     </modules>
   </component>
 </project>
