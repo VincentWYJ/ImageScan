@@ -1,6 +1,20 @@
 package com.dylan_wang.autostart;
 
+import android.annotation.TargetApi;
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.ImageFormat;
+import android.hardware.display.DisplayManager;
+import android.hardware.display.VirtualDisplay;
+import android.media.Image;
+import android.media.ImageReader;
+import android.media.projection.MediaProjection;
+import android.media.projection.MediaProjectionManager;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.util.DisplayMetrics;
 import android.view.View;
 
 import android.app.Service;
@@ -23,15 +37,24 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
+
 public class Service1 extends Service
 {
-    //定义浮动窗口布局
     LinearLayout mFloatLayout;
     WindowManager.LayoutParams wmParams;
-    //创建浮动窗口设置布局参数的对象
     WindowManager mWindowManager;
 
     ImageButton mFloatView;
+
+    private static final String STATE_RESULT_CODE = "result_code";
+    private static final String STATE_RESULT_DATA = "result_data";
+    private static final int REQUEST_MEDIA_PROJECTION = 1;
 
     @Override
     public void onCreate()
@@ -40,10 +63,6 @@ public class Service1 extends Service
         super.onCreate();
 
         createFloatView();
-
-        //kill the main acticity
-        //MainActivity ma = new MainActivity();
-        //ma.finish();
     }
 
     @Override
@@ -56,35 +75,27 @@ public class Service1 extends Service
     private void createFloatView()
     {
         wmParams = new WindowManager.LayoutParams();
-        //获取的是WindowManagerImpl.CompatModeWrapper
+
         mWindowManager = (WindowManager)getApplication().getSystemService(getApplication().WINDOW_SERVICE);
 
-        //设置window type
         wmParams.type = LayoutParams.TYPE_PHONE;
-        //设置图片格式，效果为背景透明
         wmParams.format = PixelFormat.RGBA_8888;
-        //设置浮动窗口不可聚焦（实现操作除浮动窗口外的其他可见窗口的操作）
+
         wmParams.flags = LayoutParams.FLAG_NOT_FOCUSABLE;
-        //调整悬浮窗显示的停靠位置为左侧置顶
+
         wmParams.gravity = Gravity.LEFT | Gravity.TOP;
-        // 以屏幕左上角为原点，设置x、y初始值，相对于gravity
+
         wmParams.x = 0;
         wmParams.y = 0;
 
-        //设置悬浮窗口长宽数据
         wmParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
         wmParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
 
-		 /*// 设置悬浮窗口长宽数据
-        wmParams.width = 200;
-        wmParams.height = 80;*/
-
         LayoutInflater inflater = LayoutInflater.from(getApplication());
-        //获取浮动窗口视图所在布局
         mFloatLayout = (LinearLayout) inflater.inflate(R.layout.float_layout, null);
-        //添加mFloatLayout
+
         mWindowManager.addView(mFloatLayout, wmParams);
-        //浮动窗口按钮
+
         mFloatView = (ImageButton)mFloatLayout.findViewById(R.id.float_id);
         //mFloatLayout.setBackgroundColor(Color.TRANSPARENT);
 
@@ -92,46 +103,149 @@ public class Service1 extends Service
                 View.MeasureSpec.UNSPECIFIED), View.MeasureSpec
                 .makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
 
-        //设置监听浮动窗口的触摸移动
+
         mFloatView.setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 // TODO Auto-generated method stub
-                //getRawX是触摸位置相对于屏幕的坐标，getX是相对于按钮的坐标
+
                 wmParams.x = (int) event.getRawX() - mFloatView.getMeasuredWidth() / 2;
 
-                //减25为状态栏的高度
                 wmParams.y = (int) event.getRawY() - mFloatView.getMeasuredHeight() / 2 - 25;
 
-                //刷新
                 mWindowManager.updateViewLayout(mFloatLayout, wmParams);
-                return false;  //此处必须返回false，否则OnClickListener获取不到监听
+                return false;
             }
         });
 
-        mFloatView.setOnClickListener(new OnClickListener()
-        {
+        mFloatView.setOnClickListener(new OnClickListener() {
 
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 // TODO Auto-generated method stub
-                mFloatView.setVisibility(View.INVISIBLE);   //立即消失
-                /*
-                Toast.makeText(Service1.this, "Service1", Toast.LENGTH_SHORT).show();
+                mFloatView.setVisibility(View.INVISIBLE);
+
+                //takeScreenshot(v);  //can only get the activity interface, not whole
+
+                takeScreenshot2(v);
 
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     public void run() {
-                        mFloatView.setVisibility(View.VISIBLE); //view是要隐藏的控件
+                        mFloatView.setVisibility(View.VISIBLE);
                     }
-                }, 3000);  //3000毫秒后执行
-                */
+                }, 3000);
 
-                Intent intent = new Intent(getApplicationContext(),Service1.class);
-                stopService(intent);
             }
         });
+    }
+
+    public void takeScreenshot(View v) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss");
+        String strDate = dateFormat.format(new java.util.Date());
+        String pathImage = Environment.getExternalStorageDirectory().getPath()+"/Pictures/";
+        String nameImage = pathImage + strDate + ".png";
+        int windowWidth = mWindowManager.getDefaultDisplay().getWidth();
+        int windowHeight = mWindowManager.getDefaultDisplay().getHeight();
+        Bitmap bitmap = null;
+
+        View viewScreen = v.getRootView();
+        viewScreen.setDrawingCacheEnabled(true);
+        viewScreen.buildDrawingCache();
+        bitmap = Bitmap.createBitmap(viewScreen.getDrawingCache(),0,0,viewScreen.getWidth(),viewScreen.getHeight());
+        viewScreen.destroyDrawingCache();
+
+        if (bitmap != null) {
+            //Toast.makeText(this, "go to measure bitmap value", Toast.LENGTH_SHORT).show();
+            try {
+                File fileImage = new File(nameImage);
+                if (!fileImage.exists()) {
+                    fileImage.createNewFile();
+                    //Toast.makeText(this, nameImage, Toast.LENGTH_SHORT).show();
+                }
+                //FileOutputStream out = new FileOutputStream(nameImage); //1 can also use the string object directly
+                FileOutputStream out = new FileOutputStream(fileImage);   //2
+                if (out != null) {
+                    //Toast.makeText(this, "go to measure out value", Toast.LENGTH_SHORT).show();
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                    out.flush();
+                    out.close();
+                    //Toast.makeText(this, "get phone's screen succeed", Toast.LENGTH_SHORT).show();
+
+                    Intent media = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                    Uri contentUri = Uri.fromFile(fileImage);
+                    media.setData(contentUri);
+                    getApplicationContext().sendBroadcast(media);
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            //Toast.makeText(this, "cannot get phone's screen", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public void takeScreenshot2(View v){
+        MediaProjectionManager projectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
+        Intent intent = projectionManager.createScreenCaptureIntent();
+        //startActivity(intent);
+        int mWidth = mWindowManager.getDefaultDisplay().getWidth();
+        int mHeight = mWindowManager.getDefaultDisplay().getHeight();
+        ImageReader mImageReader = ImageReader.newInstance(mWidth, mHeight, ImageFormat.RGB_565, 2);
+        DisplayMetrics metrics = new DisplayMetrics();
+        mWindowManager.getDefaultDisplay().getMetrics(metrics);
+        int mScreenDensity = metrics.densityDpi;
+        /*
+        MediaProjection mProjection = projectionManager.getMediaProjection(1, intent);
+        final VirtualDisplay virtualDisplay = mProjection.createVirtualDisplay("screen-mirror",
+                mWidth, mHeight, mScreenDensity, DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
+                mImageReader.getSurface(), null, null);
+        Image image = mImageReader.acquireLatestImage();
+        final Image.Plane[] planes = image.getPlanes();
+        final ByteBuffer buffer = planes[0].getBuffer();
+        int offset = 0;
+        int pixelStride = planes[0].getPixelStride();
+        int rowStride = planes[0].getRowStride();
+        int rowPadding = rowStride - pixelStride * mWidth;
+        Bitmap bitmap = Bitmap.createBitmap(mWidth+rowPadding/pixelStride, mHeight, Bitmap.Config.RGB_565);
+        bitmap.copyPixelsFromBuffer(buffer);
+        image.close();
+        */
+        /*
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss");
+        String strDate = dateFormat.format(new java.util.Date());
+        String pathImage = Environment.getExternalStorageDirectory().getPath()+"/Pictures/";
+        String nameImage = pathImage+strDate+".png";
+        if(bitmap != null) {
+            try{
+                File fileImage = new File(nameImage);
+                if(!fileImage.exists()){
+                    fileImage.createNewFile();
+                }
+                FileOutputStream out = new FileOutputStream(fileImage);
+                if(out != null){
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                    out.flush();
+                    out.close();
+                    Toast.makeText(this,"get phone's screen succeed",Toast.LENGTH_SHORT).show();
+                    Intent media = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                    Uri contentUri = Uri.fromFile(fileImage);
+                    media.setData(contentUri);
+                    getApplicationContext().sendBroadcast(media);
+                }
+            }catch(FileNotFoundException e) {
+                e.printStackTrace();
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+        else{
+            Toast.makeText(this,"cannot get phone's screen",Toast.LENGTH_SHORT).show();
+        }
+        */
     }
 
     @Override
@@ -141,7 +255,6 @@ public class Service1 extends Service
         super.onDestroy();
         if(mFloatLayout != null)
         {
-            //移除悬浮窗口
             mWindowManager.removeView(mFloatLayout);
         }
     }
