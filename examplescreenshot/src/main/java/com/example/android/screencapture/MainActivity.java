@@ -38,7 +38,7 @@ public class MainActivity extends SampleActivityBase {
     public static final String TAG = "MainActivity";
 
     // Whether the Log Fragment is currently shown
-    private boolean mLogShown;
+    private boolean mLogShow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +48,10 @@ public class MainActivity extends SampleActivityBase {
         if (savedInstanceState == null) {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             ScreenCaptureFragment fragment = new ScreenCaptureFragment();
-            transaction.replace(R.id.sample_content_fragment, fragment);
-            transaction.commit();
+            //use the fragment to replace the sample_content_fragment
+            transaction.replace(R.id.sample_content_fragment, fragment);  //fragment used as a part of activity
+            transaction.commit();  //commit the transaction
+            //getSupportFragmentManager().beginTransaction().replace(R.id.sample_content_fragment, new ScreenCaptureFragment());
         }
     }
 

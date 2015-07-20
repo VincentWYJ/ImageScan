@@ -16,13 +16,19 @@
 
 package com.example.android.screencapture;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.ImageFormat;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
+import android.media.Image;
+import android.media.ImageReader;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -35,6 +41,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
+
+import java.nio.ByteBuffer;
 
 /**
  * Provides UI for the screen capture.
@@ -59,6 +67,8 @@ public class ScreenCaptureFragment extends Fragment implements View.OnClickListe
     private MediaProjectionManager mMediaProjectionManager;
     private Button mButtonToggle;
     private SurfaceView mSurfaceView;
+
+    ImageReader mImageReader;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -148,10 +158,12 @@ public class ScreenCaptureFragment extends Fragment implements View.OnClickListe
         tearDownMediaProjection();
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void setUpMediaProjection() {
         mMediaProjection = mMediaProjectionManager.getMediaProjection(mResultCode, mResultData);
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void tearDownMediaProjection() {
         if (mMediaProjection != null) {
             mMediaProjection.stop();
@@ -159,6 +171,7 @@ public class ScreenCaptureFragment extends Fragment implements View.OnClickListe
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void startScreenCapture() {
         Activity activity = getActivity();
         if (mSurface == null || activity == null) {
@@ -171,6 +184,7 @@ public class ScreenCaptureFragment extends Fragment implements View.OnClickListe
             setUpVirtualDisplay();
         } else {
             Log.i(TAG, "Requesting confirmation");
+            Toast.makeText(null,"again",Toast.LENGTH_SHORT).show();
             // This initiates a prompt dialog for the user to confirm screen projection.
             startActivityForResult(
                     mMediaProjectionManager.createScreenCaptureIntent(),
@@ -178,14 +192,35 @@ public class ScreenCaptureFragment extends Fragment implements View.OnClickListe
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void setUpVirtualDisplay() {
         Log.i(TAG, "Setting up a VirtualDisplay: " +
                 mSurfaceView.getWidth() + "x" + mSurfaceView.getHeight() +
                 " (" + mScreenDensity + ")");
+/*
+        mImageReader = ImageReader.newInstance(mSurfaceView.getWidth(),
+                mSurfaceView.getHeight(), ImageFormat.RGB_565, 2);
+        mVirtualDisplay = mMediaProjection.createVirtualDisplay("ScreenCapture",
+                mSurfaceView.getWidth(), mSurfaceView.getHeight(), mScreenDensity,
+                DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
+                mImageReader.getSurface(), null, null);
+        mSurface = mImageReader.getSurface();
+        Image image = mImageReader.acquireLatestImage();
+        final Image.Plane[] planes = image.getPlanes();
+        final ByteBuffer buffer = planes[0].getBuffer();
+        int offset = 0;
+        int pixelStride = planes[0].getPixelStride();
+        int rowStride = planes[0].getRowStride();
+        int rowPadding = rowStride - pixelStride * mSurfaceView.getWidth();
+        Bitmap bitmap = Bitmap.createBitmap(mSurfaceView.getWidth() + rowPadding / pixelStride, mSurfaceView.getHeight(), Bitmap.Config.RGB_565);
+        bitmap.copyPixelsFromBuffer(buffer);
+        image.close();
+
         mVirtualDisplay = mMediaProjection.createVirtualDisplay("ScreenCapture",
                 mSurfaceView.getWidth(), mSurfaceView.getHeight(), mScreenDensity,
                 DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
                 mSurface, null, null);
+*/
         mButtonToggle.setText(R.string.stop);
     }
 

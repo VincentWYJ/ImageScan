@@ -1,5 +1,53 @@
 package com.dylan_wang.learnproject;
 
+import android.app.ExpandableListActivity;
+import android.app.LauncherActivity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.preference.PreferenceActivity;
+import android.provider.CalendarContract;
+import android.widget.ArrayAdapter;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+
+public class MainActivity extends LauncherActivity{
+    String[] names = {"JAVA","Android"};
+    Class<?>[] clazz = {MainActivity.class, MainActivity.class};
+    @Override
+    public void onCreate(Bundle bundle){
+        super.onCreate(bundle);
+        ArrayAdapter<String>adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,names);
+        setListAdapter(adapter);
+
+        Process sh;
+        try
+        {
+            sh = Runtime.getRuntime().exec("su", null, null);
+            OutputStream os = sh.getOutputStream();
+            os.write(("/system/bin/screencap -p " + "/sdcard/Image.png").getBytes("ASCII"));
+            os.flush();
+            os.close();
+            sh.waitFor();
+        }
+        catch (IOException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public Intent intentForPosition(int position){
+        return new Intent(MainActivity.this,clazz[position]);
+    }
+}
+
+
+/*
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
@@ -99,17 +147,14 @@ public class MainActivity extends ActionBarActivity {
                     intent.setAction(Intent.ACTION_DIAL);
                     // intent.setAction("android.intent.action.DIAL");
                     //intent.setAction(android.content.Intent.ACTION_DIAL);
-
                     intent.setData(Uri.parse("tel:"+inputStr));
                     MainActivity.this.startActivity(intent);
                     //intent.setAction(Intent.ACTION_CALL);
 
-                    /*
-                    Intent intent2 = new Intent();
-                    intent2.setAction(Intent.ACTION_SENDTO);
-                    intent2.setData(Uri.parse("smsto:"+inputStr));
-                    MainActivity.this.startActivity(intent2);
-                    */
+                    //Intent intent2 = new Intent();
+                    //intent2.setAction(Intent.ACTION_SENDTO);
+                    //intent2.setData(Uri.parse("smsto:"+inputStr));
+                    //MainActivity.this.startActivity(intent2);
 
                     PendingIntent mPI = PendingIntent.getBroadcast(MainActivity.this,0,new Intent(),0);
                     SmsManager smsManager = SmsManager.getDefault();
@@ -250,3 +295,4 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 }
+*/
