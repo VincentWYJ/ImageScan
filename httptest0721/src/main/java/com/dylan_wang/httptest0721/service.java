@@ -30,7 +30,7 @@ public class service {
          * 出现乱码原因有2个 提交参数没有对中文编码，解决方法：使用URLEncoder.encode(xx,xx)对要提交的汉字转码
          * tomatCAT服务器默认采用iso859-1编码，解决方法：把PHP页面保存为UTF-8格式
          */
-        String path = "http://192.168.0.117/testxml/web.php";
+        String path = "http://www.baidu.com";
         Map<String, String> params = new HashMap<String, String>();
         try {
             params.put("name", URLEncoder.encode(name, "UTF-8"));
@@ -40,7 +40,7 @@ public class service {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        return "提交失败";
+        return "connect failed";
     }
 
     private static String sendgetrequest(String path, Map<String, String> params)
@@ -54,7 +54,7 @@ public class service {
             url.append(entry.getValue()).append("&");
         }
         url.deleteCharAt(url.length() - 1);
-        URL url1 = new URL(url.toString());
+        URL url1 = new URL(url.toString());  //StringBuilder to String
         HttpURLConnection conn = (HttpURLConnection) url1.openConnection();
         conn.setConnectTimeout(5000);
         conn.setRequestMethod("GET");
@@ -69,7 +69,7 @@ public class service {
             return outstream.toString().trim();
 
         }
-        return "连接失败";
+        return "connect failed";
     }
 
     public static String post_save(String name, String phone) {
@@ -77,7 +77,7 @@ public class service {
          * 出现乱码原因有2个 提交参数没有对中文编码，解决方法：使用URLEncoder.encode(xx,xx)对要提交的汉字转码
          * tomatCAT服务器默认采用iso859-1编码，解决方法：把PHP页面保存为UTF-8格式
          */
-        String path = "http://192.168.0.117/testxml/web.php";
+        String path = "http://www.baidu.com";
         Map<String, String> params = new HashMap<String, String>();
         try {
             params.put("name", URLEncoder.encode(name, "UTF-8"));
@@ -87,7 +87,7 @@ public class service {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        return "提交失败";
+        return "connect failed";
     }
 
     private static String sendpostrequest(String path,
@@ -122,7 +122,7 @@ public class service {
             instream.close();
             return byteoutstream.toString().trim();
         }
-        return "提交失败";
+        return "connect failed";
     }
 
     public static String httpclient_postsave(String name, String phone) {
@@ -130,7 +130,7 @@ public class service {
          * 出现乱码原因有2个 提交参数没有对中文编码，解决方法：使用URLEncoder.encode(xx,xx)对要提交的汉字转码
          * tomatCAT服务器默认采用iso859-1编码，解决方法：把PHP页面保存为UTF-8格式
          */
-        String path = "http://192.168.0.117/testxml/web.php";
+        String path = "http://www.baidu.com";
         Map<String, String> params = new HashMap<String, String>();
         try {
             params.put("name", name);
@@ -140,7 +140,7 @@ public class service {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        return "提交失败";
+        return "connect failed";
     }
 
     private static String sendhttpclient_postrequest(String path,Map<String, String> params) {
@@ -172,7 +172,7 @@ public class service {
          * 出现乱码原因有2个 提交参数没有对中文编码，解决方法：使用URLEncoder.encode(xx,xx)对要提交的汉字转码
          * tomatCAT服务器默认采用iso859-1编码，解决方法：把PHP页面保存为UTF-8格式
          */
-        String path = "http://192.168.0.117/testxml/web.php";
+        String path = "http://www.baidu.com";
         Map<String, String> params = new HashMap<String, String>();
         try {
             params.put("name", name);
@@ -182,7 +182,7 @@ public class service {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        return "提交失败";
+        return "connect failed";
     }
 
     private static String sendhttpclient_getrequest(String path,Map<String, String> map_params) {
