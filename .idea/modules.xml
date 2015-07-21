@@ -6,11 +6,9 @@
       <module fileurl="file://$PROJECT_DIR$/autostart/autostart.iml" filepath="$PROJECT_DIR$/autostart/autostart.iml" />
       <module fileurl="file://$PROJECT_DIR$/examplescreenshot/examplescreenshot.iml" filepath="$PROJECT_DIR$/examplescreenshot/examplescreenshot.iml" />
       <module fileurl="file://$PROJECT_DIR$/getscreen/getscreen.iml" filepath="$PROJECT_DIR$/getscreen/getscreen.iml" />
-      <module fileurl="file://$PROJECT_DIR$/httptest0721/httptest0721.iml" filepath="$PROJECT_DIR$/httptest0721/httptest0721.iml" />
       <module fileurl="file://$PROJECT_DIR$/imageScan.iml" filepath="$PROJECT_DIR$/imageScan.iml" />
       <module fileurl="file://$PROJECT_DIR$/learnproject/learnproject.iml" filepath="$PROJECT_DIR$/learnproject/learnproject.iml" />
       <module fileurl="file://$PROJECT_DIR$/screenshot0720/screenshot0720.iml" filepath="$PROJECT_DIR$/screenshot0720/screenshot0720.iml" />
-      <module fileurl="file://$PROJECT_DIR$/systemui0721/systemui0721.iml" filepath="$PROJECT_DIR$/systemui0721/systemui0721.iml" />
     </modules>
   </component>
 </project>
