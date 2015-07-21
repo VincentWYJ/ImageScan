@@ -130,25 +130,12 @@ public class MainActivity extends ActionBarActivity {
         strDate = dateFormat.format(new java.util.Date());
         nameImage = pathImage+strDate+".png";
         dateScreen.setText(nameImage);
-
-        Toast.makeText(this,"1",Toast.LENGTH_SHORT).show();
-
-        //Intent intent = new Intent(Intent.ACTION_DIAL,Uri.parse("tel:"+"15257102022"));
-        //startActivityForResult(intent,REQUEST_MEDIA_PROJECTION);
-
-        //startActivityForResult(intent,REQUEST_MEDIA_PROJECTION);
 /*
-        Toast.makeText(this,"2",Toast.LENGTH_SHORT).show();
-
         mMediaProjection = mMediaProjectionManager.getMediaProjection(mResultCode, mResultData);
-
-        Toast.makeText(this,"3",Toast.LENGTH_SHORT).show();
 
         mMediaProjection.createVirtualDisplay("screen-mirror",
                 windowWidth, windowHeight, mScreenDensity, DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
                 mImageReader.getSurface(), null, null);
-
-        Toast.makeText(this,"4",Toast.LENGTH_SHORT).show();
 
         Image image = mImageReader.acquireLatestImage();
         final Image.Plane[] planes = image.getPlanes();
@@ -161,7 +148,7 @@ public class MainActivity extends ActionBarActivity {
         bitmap.copyPixelsFromBuffer(buffer);
         image.close();
         imgScreen.setImageBitmap(bitmap);
-*/
+
         if(bitmap != null) {
             try{
                 File fileImage = new File(nameImage);
@@ -174,7 +161,7 @@ public class MainActivity extends ActionBarActivity {
                     bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
                     out.flush();
                     out.close();
-                    Toast.makeText(this,"get phone's screen succeed",Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(this,"get phone's screen succeed",Toast.LENGTH_SHORT).show();
 
                     Intent media = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
                     Uri contentUri = Uri.fromFile(fileImage);
@@ -188,8 +175,9 @@ public class MainActivity extends ActionBarActivity {
             }
         }
         else{
-            Toast.makeText(this,"cannot get phone's screen",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this,"cannot get phone's screen",Toast.LENGTH_SHORT).show();
         }
+*/
     }
 
     @Override

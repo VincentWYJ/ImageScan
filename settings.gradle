@@ -1,1 +1,1 @@
-include ':app', ':learnproject', ':getscreen', ':autostart', ':examplescreenshot', ':screenshot0720'
+include ':app', ':learnproject', ':getscreen', ':autostart', ':examplescreenshot', ':screenshot0720', ':httptest0721'
