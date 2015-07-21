@@ -125,6 +125,32 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    public boolean takeScreenShot(String imagePath){
+        if(imagePath.equals("" )){
+            imagePath = Environment.getExternalStorageDirectory()+File. separator+"Screenshot.png" ;
+        }
+        Bitmap mScreenBitmap = null;
+        WindowManager mWindowManager;
+        DisplayMetrics mDisplayMetrics;
+        Display mDisplay;
+        mWindowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+        mDisplay = mWindowManager.getDefaultDisplay();
+        mDisplayMetrics = new DisplayMetrics();
+        mDisplay.getRealMetrics(mDisplayMetrics);
+        float[] dims = {mDisplayMetrics.widthPixels , mDisplayMetrics.heightPixels };
+        //mScreenBitmap = Surface.screenshot((int) dims[0], ( int) dims[1]);
+        if (mScreenBitmap == null) {
+            return false ;
+        }
+        try {
+            FileOutputStream out = new FileOutputStream(imagePath);
+            mScreenBitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+        } catch (Exception e) {
+            return false ;
+        }
+        return true ;
+    }
+
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void togetScreen(View view){
         strDate = dateFormat.format(new java.util.Date());
