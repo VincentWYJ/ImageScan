@@ -1,5 +1,10 @@
 package com.dylan_wang.learnproject;
 
+import android.app.Instrumentation;
+
+import android.app.LauncherActivity;
+
+/*
 import android.app.ExpandableListActivity;
 import android.app.LauncherActivity;
 import android.content.Intent;
@@ -15,6 +20,7 @@ import java.util.ArrayList;
 public class MainActivity extends LauncherActivity {
     String[] names = {"JAVA","Android"};
     Class<?>[] clazz = {MainActivity.class, MainActivity.class};
+
     @Override
     public void onCreate(Bundle bundle){
         super.onCreate(bundle);
@@ -40,21 +46,27 @@ public class MainActivity extends LauncherActivity {
         }
     }
 
+
+
     @Override
     public Intent intentForPosition(int position){
         return new Intent(MainActivity.this,clazz[position]);
     }
 }
+*/
 
-/*
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.telephony.SmsManager;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -85,6 +97,7 @@ public class MainActivity extends ActionBarActivity {
     Button to_Search;
     Button to_Delete;
     Button to_Call;
+    Button to_Key;
     TextView content_Show;
 
     String search;
@@ -93,6 +106,8 @@ public class MainActivity extends ActionBarActivity {
     String pathRoot;
     File root;
     int countImg;
+
+    Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +119,7 @@ public class MainActivity extends ActionBarActivity {
         to_Search = (Button)findViewById(R.id.to_Search);
         to_Delete = (Button)findViewById(R.id.to_Delete);
         to_Call = (Button)findViewById(R.id.to_Call);
+        to_Key = (Button)findViewById(R.id.to_Key);
         content_Show = (TextView)findViewById(R.id.content_Show);
 
         pathRoot = Environment.getExternalStorageDirectory().getPath()+"/";
@@ -117,21 +133,45 @@ public class MainActivity extends ActionBarActivity {
 
         result = "";
 
-        to_Search.setOnClickListener(new Button.OnClickListener(){
+        to_Search.setOnClickListener(new Button.OnClickListener() {
             @Override
-            public void onClick(View view){
+            public void onClick(View view) {
                 SearchFiles(view);
             }
         });
 
-        to_Delete.setOnClickListener(new Button.OnClickListener(){
+        to_Delete.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
                 DeleteFiles(view);  //1.delete file
-                Animation am = AnimationUtils.loadAnimation(MainActivity.this,R.anim.snake);
+                Animation am = AnimationUtils.loadAnimation(MainActivity.this, R.anim.snake);
                 view.startAnimation(am);  //2.animation button
             }
         });
+
+        to_Key.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Message msg = new Message();
+                //msg.what = KeyEvent.KEYCODE_BACK;
+                msg.what = Integer.parseInt(content_Search.getText().toString());
+                handler.sendMessage(msg);
+            }
+        });
+
+        Thread t = new Thread() {
+            public void run() {
+                Looper.prepare();
+                handler = new Handler() {
+                    public void handleMessage(Message msg) {
+                        Instrumentation inst = new Instrumentation();
+                        inst.sendCharacterSync(msg.what);
+                    }
+                };
+                Looper.loop();
+            }
+        };
+        t.start();
 
         to_Call.setOnClickListener(new Button.OnClickListener(){
             public void onClick(View view){
@@ -155,9 +195,9 @@ public class MainActivity extends ActionBarActivity {
                     //intent2.setData(Uri.parse("smsto:"+inputStr));
                     //MainActivity.this.startActivity(intent2);
 
-                    PendingIntent mPI = PendingIntent.getBroadcast(MainActivity.this,0,new Intent(),0);
+                    PendingIntent mPI = PendingIntent.getBroadcast(MainActivity.this, 0, new Intent(), 0);
                     SmsManager smsManager = SmsManager.getDefault();
-                    smsManager.sendTextMessage(inputStr,null,"hello world",mPI,null);
+                    smsManager.sendTextMessage(inputStr, null, "hello world", mPI, null);
                 }
             }
         });
@@ -294,4 +334,3 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 }
-*/

@@ -4,7 +4,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/autostart/autostart.iml" filepath="$PROJECT_DIR$/autostart/autostart.iml" />
-      <module fileurl="file://$PROJECT_DIR$/examplescreenshot/examplescreenshot.iml" filepath="$PROJECT_DIR$/examplescreenshot/examplescreenshot.iml" />
       <module fileurl="file://$PROJECT_DIR$/getscreen/getscreen.iml" filepath="$PROJECT_DIR$/getscreen/getscreen.iml" />
       <module fileurl="file://$PROJECT_DIR$/imageScan.iml" filepath="$PROJECT_DIR$/imageScan.iml" />
       <module fileurl="file://$PROJECT_DIR$/learnproject/learnproject.iml" filepath="$PROJECT_DIR$/learnproject/learnproject.iml" />
