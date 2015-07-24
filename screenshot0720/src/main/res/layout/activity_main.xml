@@ -20,12 +20,20 @@
             android:hint="data"
             android:layout_marginTop="20dip" />
 
+        <Button android:id="@+id/getVirtual"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Get Virtual"
+            android:gravity="center_horizontal"
+            android:layout_below="@+id/nameScreen"
+            android:layout_marginTop="20dip" />
+
         <Button android:id="@+id/getScreen"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Get Screen"
             android:gravity="center_horizontal"
-            android:layout_below="@+id/nameScreen"
+            android:layout_below="@+id/getVirtual"
             android:layout_marginTop="20dip" />
 
         <ImageView android:id="@+id/imgScreen"

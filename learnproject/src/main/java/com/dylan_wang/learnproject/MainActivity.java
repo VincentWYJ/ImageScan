@@ -154,8 +154,14 @@ public class MainActivity extends ActionBarActivity {
             public void onClick(View view) {
                 Message msg = new Message();
                 //msg.what = KeyEvent.KEYCODE_BACK;
-                msg.what = Integer.parseInt(content_Search.getText().toString());
-                handler.sendMessage(msg);
+                String s = content_Search.getText().toString();
+                if(!("".equals(s)) && s.matches("^[0-9]*$")){
+                    msg.what = Integer.parseInt(s);
+                    handler.sendMessage(msg);
+                }
+                else{
+                    Toast.makeText(getApplicationContext(),"please input a right keycde",Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -165,7 +171,8 @@ public class MainActivity extends ActionBarActivity {
                 handler = new Handler() {
                     public void handleMessage(Message msg) {
                         Instrumentation inst = new Instrumentation();
-                        inst.sendCharacterSync(msg.what);
+                        //inst.sendCharacterSync(msg.what);
+                        inst.sendKeyDownUpSync(msg.what);
                     }
                 };
                 Looper.loop();

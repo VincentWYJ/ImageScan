@@ -20,6 +20,7 @@ import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.os.Handler;
@@ -50,30 +51,35 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends FragmentActivity {
 
-    TextView dateScreen;
-    Button getScreen;
-    ImageView imgScreen;
+    private static final String TAG = "MainActivity";
 
-    SimpleDateFormat dateFormat;
-    String strDate;
-    String pathImage;
-    String nameImage;
+    private TextView dateScreen = null;
+    private Button getVirtual = null;
+    private Button getScreen = null;
+    private ImageView imgScreen = null;
 
-    MediaProjectionManager mMediaProjectionManager;
-    MediaProjection mMediaProjection;
-    int mResultCode = 0;
-    Intent mResultData = null;
-    int REQUEST_MEDIA_PROJECTION = 1;
-    Intent intent;
-    WindowManager mWindowManager;
-    int windowWidth;
-    int windowHeight;
-    ImageReader mImageReader;
-    DisplayMetrics metrics;
-    int mScreenDensity;
-    Bitmap bitmap = null;
+    private SimpleDateFormat dateFormat = null;
+    private String strDate = null;
+    private String pathImage = null;
+    private String nameImage = null;
+
+    private MediaProjectionManager mMediaProjectionManager = null;
+    private MediaProjection mMediaProjection = null;
+    private VirtualDisplay mVirtualDisplay = null;
+    private String STATE_RESULT_CODE = "result_code";
+    private String STATE_RESULT_DATA = "result_data";
+    private int mResultCode = 0;
+    private Intent mResultData = null;
+    private int REQUEST_MEDIA_PROJECTION = 1;
+
+    private WindowManager mWindowManager = null;
+    private int windowWidth = 0;
+    private int windowHeight = 0;
+    private ImageReader mImageReader = null;
+    private DisplayMetrics metrics = null;
+    private int mScreenDensity = 0;
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -81,7 +87,15 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Log.i(TAG, "main layout created");
+
+        if(savedInstanceState != null){
+            mResultCode = savedInstanceState.getInt(STATE_RESULT_CODE);
+            mResultData = savedInstanceState.getParcelable(STATE_RESULT_DATA);
+        }
+
         dateScreen = (TextView)findViewById(R.id.nameScreen);
+        getVirtual = (Button)findViewById(R.id.getVirtual);
         getScreen = (Button)findViewById(R.id.getScreen);
         imgScreen = (ImageView)findViewById(R.id.imgScreen);
 
@@ -95,10 +109,8 @@ public class MainActivity extends ActionBarActivity {
         imgScreen.setImageDrawable(getWallpaper());
 
         mMediaProjectionManager = (MediaProjectionManager)getApplication().getSystemService(Context.MEDIA_PROJECTION_SERVICE);
-        intent = mMediaProjectionManager.createScreenCaptureIntent();
-        startActivityForResult(intent,REQUEST_MEDIA_PROJECTION);
 
-        mWindowManager = (WindowManager)getApplication().getSystemService(getApplication().WINDOW_SERVICE);
+        mWindowManager = (WindowManager)getApplication().getSystemService(Context.WINDOW_SERVICE);
         windowWidth = mWindowManager.getDefaultDisplay().getWidth();
         windowHeight = mWindowManager.getDefaultDisplay().getHeight();
 
@@ -107,11 +119,42 @@ public class MainActivity extends ActionBarActivity {
         mWindowManager.getDefaultDisplay().getMetrics(metrics);
         mScreenDensity = metrics.densityDpi;
 
-        getScreen.setOnClickListener(new Button.OnClickListener(){
+        Log.i(TAG, "member defined");
+
+        getVirtual.setOnClickListener(new Button.OnClickListener(){
             public void onClick(View view){
-                togetScreen(view);
+                if(mVirtualDisplay == null){
+                    Log.i(TAG, "want to start virtual");
+                    startVirtual();
+                }
+                else{
+                    Log.i(TAG, "want to stop virtual");
+                    stopVirtual();
+                }
             }
         });
+
+        getScreen.setOnClickListener(new Button.OnClickListener(){
+            public void onClick(View view){
+                Log.i(TAG, "want to start capture");
+                startCapture();
+            }
+        });
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public void startVirtual(){
+        if (mMediaProjection != null) {
+            Log.i(TAG, "want to display virtual");
+            virtualDisplay();
+        } else if (mResultCode != 0 && mResultData != null) {  //into this block indicate mMediaProjection is null
+            Log.i(TAG, "want to define mMediaProjection and display virtual");
+            setUpMediaProjection();
+            virtualDisplay();
+        } else {
+            Log.i(TAG, "start screen capture intent");
+            startActivityForResult(mMediaProjectionManager.createScreenCaptureIntent(), REQUEST_MEDIA_PROJECTION);
+        }
     }
 
     @Override
@@ -120,79 +163,68 @@ public class MainActivity extends ActionBarActivity {
             if (resultCode != Activity.RESULT_OK) {
                 return;
             }
+            Log.i(TAG, "user agree the application to capture screen");
             mResultCode = resultCode;
             mResultData = data;
+            setUpMediaProjection();
+            virtualDisplay();
         }
-    }
-
-    public boolean takeScreenShot(String imagePath){
-        if(imagePath.equals("" )){
-            imagePath = Environment.getExternalStorageDirectory()+File. separator+"Screenshot.png" ;
-        }
-        Bitmap mScreenBitmap = null;
-        WindowManager mWindowManager;
-        DisplayMetrics mDisplayMetrics;
-        Display mDisplay;
-        mWindowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-        mDisplay = mWindowManager.getDefaultDisplay();
-        mDisplayMetrics = new DisplayMetrics();
-        mDisplay.getRealMetrics(mDisplayMetrics);
-        float[] dims = {mDisplayMetrics.widthPixels , mDisplayMetrics.heightPixels };
-        //mScreenBitmap = Surface.screenshot((int) dims[0], ( int) dims[1]);
-        if (mScreenBitmap == null) {
-            return false ;
-        }
-        try {
-            FileOutputStream out = new FileOutputStream(imagePath);
-            mScreenBitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
-        } catch (Exception e) {
-            return false ;
-        }
-        return true ;
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void togetScreen(View view){
+    public void setUpMediaProjection(){
+        mMediaProjection = mMediaProjectionManager.getMediaProjection(mResultCode, mResultData);
+        Log.i(TAG, "mMediaProjection defined");
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void virtualDisplay(){
+        mVirtualDisplay = mMediaProjection.createVirtualDisplay("screen-mirror",
+                windowWidth, windowHeight, mScreenDensity, DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
+                mImageReader.getSurface(), null, null);
+        getVirtual.setText("Stop Virtual");
+        Log.i(TAG, "virtual displayed");
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void startCapture(){
         strDate = dateFormat.format(new java.util.Date());
         nameImage = pathImage+strDate+".png";
         dateScreen.setText(nameImage);
-/*
-        mMediaProjection = mMediaProjectionManager.getMediaProjection(mResultCode, mResultData);
-
-        mMediaProjection.createVirtualDisplay("screen-mirror",
-                windowWidth, windowHeight, mScreenDensity, DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
-                mImageReader.getSurface(), null, null);
 
         Image image = mImageReader.acquireLatestImage();
+        int width = image.getWidth();
+        int height = image.getHeight();
         final Image.Plane[] planes = image.getPlanes();
         final ByteBuffer buffer = planes[0].getBuffer();
-        int offset = 0;
         int pixelStride = planes[0].getPixelStride();
         int rowStride = planes[0].getRowStride();
-        int rowPadding = rowStride - pixelStride * windowWidth;
-        bitmap = Bitmap.createBitmap(windowWidth+rowPadding/pixelStride, windowHeight, Bitmap.Config.RGB_565);
+        int rowPadding = rowStride - pixelStride * width;
+        DisplayMetrics metrics = new DisplayMetrics();
+        metrics.density = mScreenDensity;
+        Bitmap bitmap = Bitmap.createBitmap(width+rowPadding/pixelStride, height, Bitmap.Config.ARGB_8888);
         bitmap.copyPixelsFromBuffer(buffer);
         image.close();
         imgScreen.setImageBitmap(bitmap);
+        Log.i(TAG, "image data captured");
 
         if(bitmap != null) {
             try{
                 File fileImage = new File(nameImage);
                 if(!fileImage.exists()){
                     fileImage.createNewFile();
+                    Log.i(TAG, "image file created");
                 }
-                //FileOutputStream out = new FileOutputStream(nameImage); //1 can also use the string object directly
-                FileOutputStream out = new FileOutputStream(fileImage);   //2
+                FileOutputStream out = new FileOutputStream(fileImage);
                 if(out != null){
                     bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
                     out.flush();
                     out.close();
-                    //Toast.makeText(this,"get phone's screen succeed",Toast.LENGTH_SHORT).show();
-
                     Intent media = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
                     Uri contentUri = Uri.fromFile(fileImage);
                     media.setData(contentUri);
                     MainActivity.this.sendBroadcast(media);
+                    Log.i(TAG, "screen image saved");
                 }
             }catch(FileNotFoundException e) {
                 e.printStackTrace();
@@ -200,24 +232,38 @@ public class MainActivity extends ActionBarActivity {
                 e.printStackTrace();
             }
         }
-        else{
-            //Toast.makeText(this,"cannot get phone's screen",Toast.LENGTH_SHORT).show();
-        }
-*/
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+    public void onPause() {
+        super.onPause();
+        stopVirtual();
+        Log.i(TAG, "application paused");
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+    public void onDestroy() {
+        super.onDestroy();
+        tearDownMediaProjection();
+        Log.i(TAG, "application destroy");
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void tearDownMediaProjection() {
+        if (mMediaProjection != null) {
+            mMediaProjection.stop();
+            mMediaProjection = null;
         }
-        return super.onOptionsItemSelected(item);
+        Log.i(TAG,"mMediaProjection undefined");
+    }
+
+    private void stopVirtual() {
+        if (mVirtualDisplay == null) {
+            return;
+        }
+        mVirtualDisplay.release();
+        mVirtualDisplay = null;
+        getVirtual.setText("Get Virtual");
+        Log.i(TAG,"virtual display stopped");
     }
 }
