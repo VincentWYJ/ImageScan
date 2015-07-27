@@ -111,10 +111,12 @@ public class MainActivity extends FragmentActivity {
         mMediaProjectionManager = (MediaProjectionManager)getApplication().getSystemService(Context.MEDIA_PROJECTION_SERVICE);
 
         mWindowManager = (WindowManager)getApplication().getSystemService(Context.WINDOW_SERVICE);
-        windowWidth = mWindowManager.getDefaultDisplay().getWidth();
-        windowHeight = mWindowManager.getDefaultDisplay().getHeight();
+        //windowWidth = mWindowManager.getDefaultDisplay().getWidth();
+        //windowHeight = mWindowManager.getDefaultDisplay().getHeight();
+        windowWidth = 400;
+        windowHeight = 300;
 
-        mImageReader = ImageReader.newInstance(windowWidth, windowHeight, ImageFormat.RGB_565, 2);
+        mImageReader = ImageReader.newInstance(windowWidth, windowHeight, 0x1, 2); //ImageFormat.RGB_565
         metrics = new DisplayMetrics();
         mWindowManager.getDefaultDisplay().getMetrics(metrics);
         mScreenDensity = metrics.densityDpi;
@@ -137,7 +139,12 @@ public class MainActivity extends FragmentActivity {
         getScreen.setOnClickListener(new Button.OnClickListener(){
             public void onClick(View view){
                 Log.i(TAG, "want to start capture");
-                startCapture();
+                if(mVirtualDisplay != null) {
+                    startCapture();
+                }
+                else {
+                    Toast.makeText(getApplicationContext(),"virtual is not display",Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
